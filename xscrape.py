@@ -83,9 +83,12 @@ TOPICS = [
     "developer experience min_faves:200 -filter:replies lang:en",
 ]
 
-# Full pool, and how many to scrape per run.
+# Full pool, and how many to scrape per run. Each source is a separate browser
+# page load (~10-30s), so scraping all of them every run is slow and looks bot-like.
+# We sample a few at random each run; over a few runs you cover them all. Raise
+# SOURCES_PER_RUN in .env if you want more coverage per run (slower, riskier).
 QUERIES = [f"from:{a}" for a in ACCOUNTS] + TOPICS
-SAMPLE_PER_RUN = 7
+SAMPLE_PER_RUN = int(os.environ.get("SOURCES_PER_RUN", "7"))
 
 # Also pull from your own home/following timeline (people you actually follow).
 INCLUDE_FOLLOWING = True

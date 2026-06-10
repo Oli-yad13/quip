@@ -1,6 +1,6 @@
-<h1 align="center">quip</h1>
-
-<p align="center"><i>quip /kwɪp/ — a short, clever remark.</i></p>
+<p align="center">
+  <img src="quip-logo.svg" alt="quip" width="420">
+</p>
 
 <p align="center"><b>Scrape X for dev inspiration, draft posts in your own voice with a free LLM, and post them by hand.</b></p>
 
@@ -88,6 +88,40 @@ searches X for what people are actually saying and drafts posts about exactly th
 `init` seeds the first three from `*.example.md` templates. Your filled-in versions
 are git-ignored, so your personal config never ends up in the repo.
 
+## How it works
+
+quip is a handful of small Python files, each with one job:
+
+| File | Role |
+|------|------|
+| `main.py` | CLI entry + plain command dispatcher |
+| `tui.py` | The interactive `quip ›` session (Rich UI, draft cards) |
+| `core.py` | Glue — orchestrates scrape → draft, loads config & drafts |
+| `xscrape.py` | **The scraper.** The only file that uses Scrapling's stealth browser to read X |
+| `generate.py` | Sends scraped tweets to the LLM, writes drafts in your voice |
+| `sources.py` | Fallback — Hacker News + dev.to APIs (no browser) when X is unavailable |
+
+Flow of one `draft`:
+
+```
+you type `draft`            (tui.py / main.py)
+        │
+        ▼
+core.py ──▶ xscrape.py      scrape X with a headless stealth browser (Scrapling)
+        │        │
+        │        └─ X unavailable? ──▶ sources.py   (Hacker News / dev.to)
+        ▼
+core.py ──▶ generate.py     LLM drafts posts in your voice ──▶ drafts/*.json
+        │
+        ▼
+you `review` ──▶ copy the good ones ──▶ post by hand
+```
+
+All X scraping lives in **`xscrape.py`** — it launches the stealth browser, loads
+X search / your home feed, and pulls tweet text out with CSS selectors like
+`article[data-testid="tweet"]`. When X changes its markup, those selectors are
+what need updating (PRs welcome).
+
 ## Commands
 
 ```bash
@@ -103,9 +137,11 @@ python main.py edit voice # open a config file (voice|topics|categories|sources|
 ## How drafting stays free
 
 It calls GitHub Models with your GitHub token — free for every account, no card.
-Default model is `openai/gpt-4.1`; set `MODEL=openai/gpt-4o-mini` in `.env` if you
-hit rate limits. (Note: GitHub Copilot has no script API; GitHub Models is the
-script-friendly equivalent.)
+Default model is `openai/gpt-5-chat` (most natural-sounding); set
+`MODEL=openai/gpt-4o-mini` in `.env` for a higher free quota if you hit rate
+limits. You can also point it at any OpenAI-compatible provider (Ollama, Groq,
+OpenRouter, OpenAI) via `AI_BASE_URL` + `AI_API_KEY` — see `.env.example`.
+(Note: GitHub Copilot has no script API; GitHub Models is the script-friendly equivalent.)
 
 ## Contributing
 

@@ -135,7 +135,41 @@ def generate_drafts(trending: list[dict], count: int = 3, focus: str | None = No
             f"subjects, angles, and projects:\n{joined}\n"
         )
 
-    response = client.chat.completions.create(
+    try:
+        response = _create(client, count, news, focus, variety, user_intro, avoid)
+    except Exception as e:
+        msg = str(e)
+        if "429" in msg or "Too many requests" in msg or "rate limit" in msg.lower():
+            raise SystemExit(
+                f"\nHit the GitHub Models rate limit. The current model ({MODEL}) has a "
+                "low free daily quota.\n"
+                "  - Wait a while (the limit resets), or\n"
+                "  - Set  MODEL=openai/gpt-4o-mini  in .env for a much higher free quota,\n"
+                "    then run again.\n"
+            )
+        raise
+
+    drafts = _parse_json(response.choices[0].message.content)["drafts"]
+
+    DRAFTS_DIR.mkdir(exist_ok=True)
+    stamp = datetime.now().strftime("%Y-%m-%d_%H%M")
+    saved = []
+    for i, d in enumerate(drafts):
+        record = {
+            "text": _humanize(d["text"]),
+            "category": d.get("category", ""),
+            "inspiration": d.get("inspiration", ""),
+            "status": "pending",  # pending -> posted (or skipped)
+            "created": stamp,
+        }
+        path = DRAFTS_DIR / f"{stamp}_{i}.json"
+        path.write_text(json.dumps(record, indent=2), encoding="utf-8")
+        saved.append(record)
+    return saved
+
+
+def _create(client, count, news, focus, variety, user_intro, avoid):
+    return client.chat.completions.create(
         model=MODEL,
         response_format={"type": "json_object"},
         messages=[
@@ -162,21 +196,3 @@ def generate_drafts(trending: list[dict], count: int = 3, focus: str | None = No
             },
         ],
     )
-
-    drafts = _parse_json(response.choices[0].message.content)["drafts"]
-
-    DRAFTS_DIR.mkdir(exist_ok=True)
-    stamp = datetime.now().strftime("%Y-%m-%d_%H%M")
-    saved = []
-    for i, d in enumerate(drafts):
-        record = {
-            "text": _humanize(d["text"]),
-            "category": d.get("category", ""),
-            "inspiration": d.get("inspiration", ""),
-            "status": "pending",  # pending -> posted (or skipped)
-            "created": stamp,
-        }
-        path = DRAFTS_DIR / f"{stamp}_{i}.json"
-        path.write_text(json.dumps(record, indent=2), encoding="utf-8")
-        saved.append(record)
-    return saved
