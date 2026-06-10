@@ -6,6 +6,28 @@
 
 <p align="center">No paid API. No auto-posting. You stay the editor.</p>
 
+```text
+╭──────────────────── ✦ quip ────────────────────╮
+│                                                 │
+│      __ _ _   _(_)_ __                           │
+│     / _` | | | | | '_ \      a short, clever     │
+│    | (_| | |_| | | |_) |     remark              │
+│     \__, |\__,_|_| .__/                          │
+│        |_|        |_|                            │
+│                                                 │
+╰─────────────────────────────────────────────────╯
+
+✦ quip › about fable 5
+  ✦ searching X for 'fable 5'…
+
+  ✦ hot-take · 97 chars
+  │ rip fable 5. june 22 we lose the only claude
+  │ that could eat a 200mb csv without breaking a sweat
+
+✦ quip › review
+  c · copy    s · skip    q · quit
+```
+
 ---
 
 Growing a developer presence on X means posting good things consistently — which
@@ -22,7 +44,7 @@ Hacker News / dev.to    ─┘        (voice.md · topics.md · categories.md)
 (fallback)
 ```
 
-## Features
+## ✦ Features
 
 - **Reads your following feed** plus a pool of 30+ dev accounts and topic searches (sampled for variety each run).
 - **Your voice, your topics, your categories** — three plain-text config files you control. Nothing is hardcoded.
@@ -34,7 +56,7 @@ Hacker News / dev.to    ─┘        (voice.md · topics.md · categories.md)
 > account for scraping — never the account you post from. Keep volume low. If the
 > scraper breaks (X changes its UI), it falls back to the Hacker News + dev.to APIs.
 
-## Quick start
+## ✦ Quick start
 
 ```bash
 # 1. Install
@@ -57,7 +79,7 @@ python main.py login         # sign in; the session is saved to ./xprofile
 python main.py               # interactive session: type draft, review, status, ...
 ```
 
-### The session
+### ✦ The session
 
 ```
 quip > draft 3          # scrape your feed + write 3 drafts (shown as cards)
@@ -75,7 +97,7 @@ quip > quit
 type the thing (a new model drop, a framework release, some drama), and quip
 searches X for what people are actually saying and drafts posts about exactly that.
 
-## Configuration
+## ✦ Configuration
 
 | File | What it controls |
 |------|------------------|
@@ -88,7 +110,7 @@ searches X for what people are actually saying and drafts posts about exactly th
 `init` seeds the first three from `*.example.md` templates. Your filled-in versions
 are git-ignored, so your personal config never ends up in the repo.
 
-## How it works
+## ✦ How it works
 
 quip is a handful of small Python files, each with one job:
 
@@ -122,7 +144,7 @@ X search / your home feed, and pulls tweet text out with CSS selectors like
 `article[data-testid="tweet"]`. When X changes its markup, those selectors are
 what need updating (PRs welcome).
 
-## Commands
+## ✦ Commands
 
 ```bash
 python main.py            # interactive session (recommended)
@@ -134,7 +156,7 @@ python main.py status     # counts
 python main.py edit voice # open a config file (voice|topics|categories|sources|env)
 ```
 
-## How drafting stays free
+## ✦ How drafting stays free
 
 It calls GitHub Models with your GitHub token — free for every account, no card.
 Default model is `openai/gpt-5-chat` (most natural-sounding); set
@@ -143,11 +165,11 @@ limits. You can also point it at any OpenAI-compatible provider (Ollama, Groq,
 OpenRouter, OpenAI) via `AI_BASE_URL` + `AI_API_KEY` — see `.env.example`.
 (Note: GitHub Copilot has no script API; GitHub Models is the script-friendly equivalent.)
 
-## Contributing
+## ✦ Contributing
 
 PRs welcome — especially fixes to the X selectors in `xscrape.py` when X changes
 its UI, and new source/category ideas. Open an issue first for anything large.
 
-## License
+## ✦ License
 
 MIT — see [LICENSE](LICENSE).
