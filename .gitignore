@@ -1,0 +1,29 @@
+# Secrets & personal data (NEVER commit)
+.env
+voice.md
+topics.md
+categories.md
+HOWTO.md
+
+# Runtime / generated
+drafts/
+xprofile/
+chrome-profile/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+build/
+dist/
+
+# Editors / OS
+.aider*
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
